@@ -7,7 +7,7 @@ import time
 ADAFRUIT_IO_KEY = ''
 ADAFRUIT_IO_USERNAME = ''
 SERIAL_MESSASGE_LENGHT = 13
-INITIAL_UPDATE_TIME = 1
+DESIRED_UPDATE_TIME = 1
 UPDATE_TIME_THRESHOLD = 500
 
 try:
@@ -18,7 +18,7 @@ try:
         print("Invalid login values")
         exit()
     ser = serial.Serial('/dev/ttyUSB0', 115200)
-    sleeping_time = INITIAL_UPDATE_TIME
+    sleeping_time = DESIRED_UPDATE_TIME
     while True:
         if ser.in_waiting != 0 and (ser.in_waiting%SERIAL_MESSASGE_LENGHT) == 0:
             lines = ser.read_all()
@@ -26,8 +26,11 @@ try:
                 lines = lines.decode().strip("\n\r").split("\n\r")
                 temp = lines[-1]
                 temp = re.findall("\d+\.\d+", temp)[0]
+
                 try:
                     aio.send_data(feed.key, temp)
+                    if sleeping_time > DESIRED_UPDATE_TIME:
+                        sleeping_time = sleeping_time - 1 #Response to exponential backoff, similar to TCP
                 except Adafruit_IO.ThrottlingError:
                     print("too fast")
                     if sleeping_time > UPDATE_TIME_THRESHOLD:
@@ -35,6 +38,7 @@ try:
                         exit()
                     sleeping_time = sleeping_time * 2 #exponential backoff
                 print(temp)
+                
         time.sleep(sleeping_time)
 except Exception as e:
     print(e)
