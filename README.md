@@ -14,6 +14,8 @@ This project showcases the development of an IoT system that integrates Alexa wi
 
 This project integrates Amazon Alexa with sensors connected to an Infineon board. It leverages the Adafruit cloud for storage and data fetching, and IFTTT services to interconnect Alexa with the Adafruit portal. The implementation includes the use of a real-time operating system (RTOS) to manage the execution of essential routines required for sensor and network communication.
 
+![Schema](images/schema.png)
+
 ## Features
 
 - **Alexa Integration**: Control and monitor sensors through Amazon Alexa.
